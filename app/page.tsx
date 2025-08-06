@@ -1,103 +1,211 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { TemplateCard } from '@/components/TemplateCard';
+import { AddTemplateForm } from '@/components/AddTemplateForm';
+import { SearchBar } from '@/components/SearchBar';
+import { FilterPanel } from '@/components/FilterPanel';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Template } from '@/lib/db';
+import { Badge } from '@/components/ui/badge';
+import { Layers3 } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [displayedTemplates, setDisplayedTemplates] = useState<(Template & { 
+    similarity?: number;
+    matchType?: 'vector' | 'fulltext' | 'both';
+  })[]>([]);
+  const [filteredTemplates, setFilteredTemplates] = useState<(Template & { 
+    similarity?: number;
+    matchType?: 'vector' | 'fulltext' | 'both';
+  })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetchTemplates = async () => {
+    try {
+      const response = await fetch('/api/templates');
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      setTemplates(data);
+      setDisplayedTemplates(data);
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const handleSearch = (results: (Template & { 
+    similarity?: number;
+    matchType?: 'vector' | 'fulltext' | 'both';
+  })[]) => {
+    setDisplayedTemplates(results);
+    setFilteredTemplates(results);
+    setIsSearching(true);
+    setIsFiltering(false);
+  };
+
+  const handleClearSearch = () => {
+    setDisplayedTemplates(templates);
+    setFilteredTemplates(templates);
+    setIsSearching(false);
+    setIsFiltering(false);
+  };
+
+  const handleFilterChange = (filtered: Template[]) => {
+    setFilteredTemplates(filtered as any);
+    setIsFiltering(true);
+  };
+
+  const handleClearFilters = () => {
+    setFilteredTemplates(isSearching ? displayedTemplates : templates);
+    setIsFiltering(false);
+  };
+
+  const handleTemplateAdded = () => {
+    fetchTemplates();
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background gradient mesh */}
+      <div className="fixed inset-0 gradient-mesh opacity-50" />
+      
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Theme Toggle */}
+        <div className="fixed top-6 right-6 z-50">
+          <ThemeToggle />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Header */}
+        <header className="py-20 text-center">
+          <div className="flex justify-center mb-10">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(var(--primary)/0.5)] to-[hsl(var(--primary)/0.3)] rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+              <div className="relative glass p-5 rounded-2xl">
+                <Layers3 className="w-14 h-14 text-[hsl(var(--primary))]" />
+              </div>
+            </div>
+          </div>
+          
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-br from-[hsl(var(--foreground))] to-[hsl(var(--foreground)/0.7)] bg-clip-text text-transparent">
+            Template{' '}
+            <span className="bg-gradient-to-r from-[hsl(var(--primary))] to-blue-400 bg-clip-text text-transparent">Library</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-[hsl(var(--muted-foreground))] max-w-3xl mx-auto leading-relaxed">
+            Discover and search through curated code templates using AI-powered semantic search.
+            Find the perfect starting point for your next project.
+          </p>
+        </header>
+
+        {/* Search Section */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="glass p-2 rounded-2xl shadow-xl">
+            <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
+          </div>
+        </div>
+
+        {/* Results Info */}
+        {(isSearching || isFiltering) && (
+          <div className="flex justify-center mb-10">
+            <div className="glass px-5 py-2.5 rounded-full inline-flex items-center gap-3">
+              <div className="w-2 h-2 bg-[hsl(var(--primary))] rounded-full animate-pulse" />
+              <span className="text-sm font-medium">
+                {filteredTemplates.length} {filteredTemplates.length === 1 ? 'result' : 'results'} found
+                {isFiltering && !isSearching && ` (filtered from ${templates.length})`}
+              </span>
+              {displayedTemplates.length > 0 && displayedTemplates[0].similarity && (
+                <>
+                  <div className="w-px h-4 bg-[hsl(var(--border))]" />
+                  <span className="text-sm text-[hsl(var(--muted-foreground))]">
+                    Sorted by relevance
+                  </span>
+                  {(() => {
+                    const avgSimilarity = filteredTemplates
+                      .filter(t => t.similarity)
+                      .reduce((acc, t) => acc + (t.similarity || 0), 0) / filteredTemplates.filter(t => t.similarity).length;
+                    return avgSimilarity > 0 ? (
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${
+                          avgSimilarity >= 80 
+                            ? 'border-emerald-500/50 text-emerald-600' 
+                            : avgSimilarity >= 70 
+                            ? 'border-amber-500/50 text-amber-600'
+                            : 'border-gray-500/50 text-gray-600'
+                        }`}
+                      >
+                        {avgSimilarity.toFixed(0)}% avg match
+                      </Badge>
+                    ) : null;
+                  })()}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Content with Filter Sidebar */}
+        <main className="pb-32">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Filter Panel - Desktop Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <FilterPanel 
+                  templates={isSearching ? displayedTemplates : templates} 
+                  onFilterChange={handleFilterChange}
+                  onClearFilters={handleClearFilters}
+                />
+              </div>
+            </div>
+
+            {/* Templates Grid */}
+            <div className="lg:col-span-3">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-24">
+              <div className="relative">
+                <div className="w-20 h-20 border-4 border-[hsl(var(--primary)/0.2)] rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-20 h-20 border-4 border-[hsl(var(--primary))] rounded-full animate-spin border-t-transparent"></div>
+              </div>
+              <p className="mt-8 text-[hsl(var(--muted-foreground))] font-medium">Loading templates...</p>
+            </div>
+          ) : filteredTemplates.length === 0 ? (
+            <div className="text-center py-24">
+              <div className="inline-flex items-center justify-center w-24 h-24 glass rounded-3xl mb-8">
+                <Layers3 className="w-12 h-12 text-[hsl(var(--primary)/0.6)]" />
+              </div>
+              <h2 className="text-3xl font-semibold mb-4">
+                {isSearching ? 'No matches found' : isFiltering ? 'No templates match filters' : 'No templates yet'}
+              </h2>
+              <p className="text-[hsl(var(--muted-foreground))] max-w-md mx-auto text-lg">
+                {isSearching 
+                  ? 'Try adjusting your search terms or browse all templates' 
+                  : isFiltering
+                  ? 'Try adjusting your filters or clear them to see all templates'
+                  : 'Be the first to add a template to the library. Click the button below to get started.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {filteredTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          )}
+            </div>
+          </div>
+        </main>
+
+        {/* Add Template Button */}
+        <AddTemplateForm onTemplateAdded={handleTemplateAdded} />
+      </div>
     </div>
   );
 }

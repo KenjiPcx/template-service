@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1754475468759,
+      "tag": "0000_clean_deathstrike",
+      "breakpoints": true
+    }
+  ]
+}
