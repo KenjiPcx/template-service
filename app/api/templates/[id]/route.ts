@@ -33,7 +33,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, description, bestUseCase, type, libraryTags, architectureTags, githubUrl } = body;
+    const { title, description, bestUseCase, type, libraryTags, architectureTags, githubUrl, notes } = body;
 
     const textToEmbed = `${title} ${description} ${bestUseCase || ''} ${type || ''} ${libraryTags?.join(' ') || ''} ${architectureTags?.join(' ') || ''}`;
     
@@ -52,6 +52,7 @@ export async function PUT(
         libraryTags: libraryTags || [],
         architectureTags: architectureTags || [],
         githubUrl,
+        notes,
         embedding: embedding as any,
         updatedAt: new Date(),
       })

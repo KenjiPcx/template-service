@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, bestUseCase, type = 'starter', libraryTags, architectureTags, githubUrl } = body;
+    const { title, description, bestUseCase, type = 'starter', libraryTags, architectureTags, githubUrl, notes } = body;
 
     if (!title || !description || !bestUseCase || !githubUrl) {
       return NextResponse.json(
@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
         libraryTags: libraryTags || [],
         architectureTags: architectureTags || [],
         githubUrl,
+        notes,
         embedding: embedding as any,
       }).returning();
       

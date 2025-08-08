@@ -11,6 +11,7 @@ const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
 
 const seedData = [
+  // Starter Templates
   {
     title: 'AI Chatbot',
     description: 'An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, and Vercel KV',
@@ -64,6 +65,28 @@ const seedData = [
     libraryTags: ['expo', 'react-native', 'nextjs', 'trpc', 'prisma', 'turborepo', 'typescript'],
     architectureTags: ['monorepo', 'mobile', 'cross-platform'],
     githubUrl: 'https://github.com/t3-oss/create-t3-turbo'
+  },
+  
+  // Add-on Templates
+  {
+    title: 'Vector Search Example',
+    description: 'A complete implementation of semantic search using pgvector and OpenAI embeddings. Features a clean UI for searching content with natural language queries and real-time similarity matching.',
+    bestUseCase: 'Learning how to implement vector search and semantic similarity matching in your applications. Great example for adding AI-powered search to any content platform, documentation site, or knowledge base.',
+    type: 'addon' as const,
+    libraryTags: ['nextjs', 'react', 'typescript', 'tailwindcss', 'drizzle', 'postgresql', 'pgvector', 'openai'],
+    architectureTags: ['search', 'ai', 'semantic-search', 'embeddings', 'vector-database'],
+    githubUrl: 'https://github.com/kenjipcx-fern/template-service',
+    notes: 'This is the same repository that powers this template discovery platform. Check the README for detailed implementation guide.'
+  },
+  {
+    title: 'UploadThing File Upload',
+    description: 'Modern file upload implementation with UploadThing. Features drag-and-drop, progress tracking, image preview, and automatic cloud storage with type-safe APIs.',
+    bestUseCase: 'Quick implementation of production-ready file uploads with minimal configuration. Perfect for user avatars, document uploads, image galleries, and any file storage needs.',
+    type: 'addon' as const,
+    libraryTags: ['nextjs', 'react', 'typescript', 'uploadthing', 'tailwindcss'],
+    architectureTags: ['file-upload', 'cloud-storage', 'media-handling', 'forms'],
+    githubUrl: 'https://github.com/kenjipcx-fern/template-upload-thing',
+    notes: 'Looking for more UploadThing examples? The official repository contains 20+ additional examples including: S3 uploads, multiple file handling, image optimization, video uploads, and more. Check them out at: https://github.com/pingdotgg/uploadthing/tree/main/examples'
   }
 ];
 
@@ -101,6 +124,9 @@ async function seed() {
     }
     
     console.log('🎉 Seed completed successfully!');
+    console.log(`📊 Total templates added: ${seedData.length}`);
+    console.log(`   • Starter templates: ${seedData.filter(t => t.type === 'starter').length}`);
+    console.log(`   • Add-on templates: ${seedData.filter(t => t.type === 'addon').length}`);
   } catch (error) {
     console.error('❌ Seed failed:', error);
     process.exit(1);

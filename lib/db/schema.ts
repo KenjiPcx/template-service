@@ -12,6 +12,7 @@ export const templates = pgTable('templates', {
   libraryTags: text('library_tags').array().notNull().default([]),
   architectureTags: text('architecture_tags').array().notNull().default([]),
   githubUrl: varchar('github_url', { length: 500 }).notNull(),
+  notes: text('notes'), // Additional references, examples links, warnings, etc.
   embedding: vector('embedding', { dimensions: 1536 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
